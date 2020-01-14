@@ -108,7 +108,7 @@ void analysis_fit()
   for (int i = 0; i < nbin; i++){
 	eff_arr[i] = (double) eta_rec_arr[i]/eta_tru_arr[i];
 	if (eta_rec_arr[i] != 0){
-		unc_arr[i] = sqrt(eff_arr[i]*(1-eff_arr[i])/eta_rec_arr[i]);
+		unc_arr[i] = sqrt(eff_arr[i]*(1-eff_arr[i])/eta_tru_arr[i]) / 2;
 	}
 	cout << eff_arr[i] << endl;  
   }
