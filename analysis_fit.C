@@ -66,8 +66,7 @@ void analysis_fit()
   
   TTreeFormula fRec("fRec","PidChargedCand@.GetEntries()",cbmsim);
   TTreeFormula fEtaTru("fEtaTru","MCTrack.GetMomentum().Eta()", cbmsim);
-  TTreeFormula fEtaRec("fEtaRec","PidChargedCand.GetMomentum().Eta()", cbmsim);
-  
+ 
   double edge[nbin + 2]; // edge = [-5.0, -4.9, ..., 4.9, 5.0]
   const double interval = 0.1;
 
@@ -76,7 +75,7 @@ void analysis_fit()
 	edge[i] = eta_min + i * interval;
   }
 
-  int eta_rec_arr[nbin] = {0}; // eta_rec_arr[0] is the # of tracks whose eta_tru & eta_rec are both in -5.0~-4.9
+  int eta_rec_arr[nbin] = {0}; // eta_rec_arr[0] is the # of tracks whose eta_tru is in -5.0~-4.9 and rec == 1
   int eta_tru_arr[nbin] = {0}; // eta_tru_arr[0] is the # of tracks whose eta_tru is in -5.0~-4.9
   double eff_arr[nbin] = {0}; // eff_arr[0] = eta_rec_arr[0] / eta_tru_arr[0]
   double unc_arr[nbin] = {0};
@@ -86,16 +85,14 @@ void analysis_fit()
 	  
 	  cbmsim->GetEntry(j);
 	  const double eta_tru = fEtaTru.EvalInstance();
-   	  const double eta_rec = fEtaRec.EvalInstance();
- 	  const int rec = fRec.EvalInstance();
+	  const int rec = fRec.EvalInstance();
 
           for (int i = 0; i < nbin; i++){
 	     const double low = edge[i];
 	     const double high = edge[i+1];
-	     // cout << low << " " << high << endl;
-	     
+     
 	     if (eta_tru >= low && eta_tru < high){
-		     if (eta_rec >= low && eta_rec < high && rec == 1){
+		     if (rec == 1){ // yes, eta_rec does not have to fall in the same eta interval to be reconstructed for efficiency plots
 			 eta_rec_arr[i] += 1;
 		     }
 
@@ -108,7 +105,7 @@ void analysis_fit()
   for (int i = 0; i < nbin; i++){
 	eff_arr[i] = (double) eta_rec_arr[i]/eta_tru_arr[i];
 	if (eta_rec_arr[i] != 0){
-		unc_arr[i] = sqrt(eff_arr[i]*(1-eff_arr[i])/eta_tru_arr[i]) / 2;
+		unc_arr[i] = sqrt(eff_arr[i]*(1-eff_arr[i])/eta_tru_arr[i]); // yes, no need to divide by 2
 	}
 	cout << eff_arr[i] << endl;  
   }
