@@ -77,9 +77,7 @@ void analysis_fit()
 
   int eta_rec_arr[nbin] = {0}; // eta_rec_arr[0] is the # of tracks whose eta_tru is in -5.0~-4.9 and rec == 1
   int eta_tru_arr[nbin] = {0}; // eta_tru_arr[0] is the # of tracks whose eta_tru is in -5.0~-4.9
-  double eff_arr[nbin] = {0}; // eff_arr[0] = eta_rec_arr[0] / eta_tru_arr[0]
-  double unc_arr[nbin] = {0};
-
+  
   // cast values for eta_rec_arr & eta_tru_arr
   for (int j = 0; j < nEvt; j++) { 
 	  
@@ -101,19 +99,16 @@ void analysis_fit()
           }
    }
   
-  // cast values for eff_arr & unc_arr; cout eff
+  // cout eta_tru_arr
   for (int i = 0; i < nbin; i++){
-	eff_arr[i] = (double) eta_rec_arr[i]/eta_tru_arr[i];
-	if (eta_rec_arr[i] != 0){
-		unc_arr[i] = sqrt(eff_arr[i]*(1-eff_arr[i])/eta_tru_arr[i]); // yes, no need to divide by 2
-	}
-	cout << eff_arr[i] << endl;  
+	cout << eta_tru_arr[i] << endl;  
   }
   
   cout << "+++++++++++++++++++++++++++++++" << endl;
   
+  // cout eta_rec_arr
   for (int i = 0; i < nbin; i++){
-	cout << unc_arr[i] << endl;  
+	cout << eta_rec_arr[i] << endl;  
   }
 
 #endif
