@@ -8,7 +8,7 @@
 // to propagate this information further down the chain;
 //#define _WITH_MUMEGAS_
 
-void simulation(Int_t nEvents = 6000, Int_t allSi = 1)
+void simulation(Int_t nEvents = 100000, Int_t allSi = 1)
 {
   // Load basic libraries;
   gROOT->Macro("$VMCWORKDIR/gconfig/rootlogon.C");
