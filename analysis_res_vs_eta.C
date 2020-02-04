@@ -86,13 +86,15 @@ void analysis_res_vs_eta()
   TH1D *s_x = new TH1D("s_x", "", nbin, eta_min, eta_max);
   s_x->Sumw2();
   for (int i = 0; i < nbin; i++) {
-	  fit.Add(new TF1(Form("fit%lu", i), "gaus", -0.1, 0.1));
-	  if (proj.At(i) != NULL && ((TH1D *)proj.At(i))->GetEntries() >= 20) {
-	  	  ((TH1D *)proj.At(i))->Fit((TF1 *)fit.At(i), "rll");
-		  y_arr[i] = ((TF1 *)fit.At(i))->GetParameter(2);
-		  yerr_arr[i] = ((TF1 *)fit.At(i))->GetParError(2);
-	  	  s_x->SetBinContent(i + 1, ((TF1 *)fit.At(i))->GetParameter(2));
-	  	  s_x->SetBinError(i + 1, ((TF1 *)fit.At(i))->GetParError(2));
+	if (proj.At(i) != NULL && ((TH1D *)proj.At(i))->GetEntries() >= 20) {
+	  	TF1 *f = new TF1(Form("fit%lu", i), "[0]/sqrt(2*TMath::Pi()*[2]^2)*exp(-0.5*((x-[1])/[2])**2)", -0.05, 0.05);
+		f->SetParameter(2, 0.01);
+		fit.Add(f);
+  		((TH1D *)proj.At(i))->Fit((TF1 *)fit.At(i), "rll");
+		y_arr[i] = ((TF1 *)fit.At(i))->GetParameter(2);
+		yerr_arr[i] = ((TF1 *)fit.At(i))->GetParError(2);
+	  	s_x->SetBinContent(i + 1, ((TF1 *)fit.At(i))->GetParameter(2));
+	  	s_x->SetBinError(i + 1, ((TF1 *)fit.At(i))->GetParError(2));
 	  }
   }
  
