@@ -100,7 +100,7 @@ void analysis_res_vs_eta_check_gaus()
   for (int i = 0; i < nbin; i++){
 	cout << count[i] << endl;
   }
-  TFile f("output/10_w_2gaus.root","new");
+  TFile f("output/20_w_2gaus.root","new");
   gStyle->SetOptStat(11);
   gStyle->SetOptFit(1);
   gStyle->SetStatW(0.2);
@@ -113,8 +113,8 @@ void analysis_res_vs_eta_check_gaus()
  	dist = ((TH1D *)proj.At(i));
 	fit = ((TF1 *)fitArr.At(i));
 	//mu = fit->GetParameter(0);
-	fit->SetParameter(4, -0.020);
-	fit->SetParameter(2, -0.020);
+	fit->SetParameter(4, -0.015);
+	fit->SetParameter(2, -0.015);
  	dist->Fit(fit, "rll");
  	dist->GetXaxis()->SetTitle("dp/p");
   	dist->GetYaxis()->SetTitle("counts");
