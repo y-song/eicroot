@@ -62,10 +62,11 @@ void analysis_res_vs_eta_check_gaus()
   const double eta_min = -5.0;
   const double eta_max = 5.0;
   const double interval = 0.2;
-  double eta_bin[nbin + 2];
+  double eta_bin[nbin + 1];
   for (int i = 0; i < nbin + 1; i++){
   	eta_bin[i] = eta_min + i * interval;
   }
+  int count[nbin] = {0};
  
 #if 1
   
@@ -76,21 +77,30 @@ void analysis_res_vs_eta_check_gaus()
   TH1D count_eta("count_eta", "", nbin, eta_min, eta_max);
   count_eta.Sumw2(); // If TH1::Sumw2() has been called before filling, the sum of squares is also stored.
   for (int i = 0; i < nbin; i++) {
-  	  proj.Add(new TH1D(Form("%0.1f_eta_%0.1f", eta_bin[i], eta_bin[i+1]),"", 200, -0.05, 0.05));
-  	  fitArr.Add(new TF1(Form("fit%lu", i), "gaus", -0.05, 0.05));
+  	  proj.Add(new TH1D(Form("%0.1f_eta_%0.1f", eta_bin[i], eta_bin[i+1]),"", 50, -0.03, 0.03));
+  	  //fitArr.Add(new TF1(Form("fit%lu", i), "gaus(0)+gaus(3)", -0.03, 0.03));
+ 	  fitArr.Add(new TF1(Form("fit%lu", i), "[0]/sqrt(2*TMath::Pi()*[2]^2)*exp(-0.5*((x-[1])/[2])**2) + [3]/sqrt(2*TMath::Pi()*[4]^2)*exp(-0.5*((x-[1])/[4])**2)", -0.03, 0.03));
   }
   for (Long64_t j = 0; j < cbmsim->GetEntries(); j++) {
-  //for (Long64_t j = 0; j < 200000; j++) {
+  //for (Long64_t j = 0; j < 20000; j++) {
   	  cbmsim->GetEntry(j);
   	  const double eta_tru = fEtaTru.EvalInstance();
 	  const double x = fx.EvalInstance();
   	  const Int_t root_bin = count_eta.GetXaxis()->FindFixBin(eta_tru); // TAxis * axis is the axis object, which will be returned when calling the TH1::GetAxis() method. FindFixBin() finds bin number corresponding to abscissa x.
   	  if (root_bin >= 1 && root_bin < nbin + 1) {
   		  ((TH1D *)proj.At(root_bin - 1))->Fill(x);
+	  }
+	  for (int i = 0; i < nbin; i++){
+	  	  if (eta_bin[i] < eta_tru && eta_tru < eta_bin[i+1]) {
+	  	  	count[i] += 1;
+  	  	  }
   	  }
-  }
+  } 
 
-  TFile f("output/tests_10_w_gaus.root","new");
+  for (int i = 0; i < nbin; i++){
+	cout << count[i] << endl;
+  }
+  TFile f("output/tests_1_w_gaus.root","new");
   gStyle->SetOptStat(11);
   gStyle->SetOptFit(1);
   gStyle->SetStatW(0.2);
@@ -99,15 +109,14 @@ void analysis_res_vs_eta_check_gaus()
   canv->Divide(4,4);
   
   for (int i = 17; i < 33; i++){
-  //for (int i = 0; i < nbin; i++){
-	canv->cd(i-16);
+ 	canv->cd(i-16);
  	dist = ((TH1D *)proj.At(i));
 	fit = ((TF1 *)fitArr.At(i));
-	fit->SetParameter(2, 0.01);
+	//mu = fit->GetParameter(0);
+	fit->SetParameter(4, -0.01);
+	fit->SetParameter(2, -0.01);
  	dist->Fit(fit, "rll");
-	mu = fit->GetParameter(2);
-	sigma = fit->GetParError(2);
-  	dist->GetXaxis()->SetTitle("dp/p");
+ 	dist->GetXaxis()->SetTitle("dp/p");
   	dist->GetYaxis()->SetTitle("counts");
   	dist->SetMarkerStyle(20);
         dist->SetLineColor(kBlack);
