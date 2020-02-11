@@ -108,10 +108,10 @@ void analysis_res_dist_high_eta()
   //gStyle->SetTitleFontSize(.8);
   //gStyle->SetLabelSize(.5, "XY");
   TCanvas *canv = new TCanvas("canv", "canv", 1600, 1200);
-  canv->Divide(4,4);
+  canv->Divide(4,3);
   
-  for (int i = 33; i < 47; i++){
- 	canv->cd(i-16);
+  for (int i = 33; i < 45; i++){
+ 	canv->cd(i-32);
  	dist = ((TH1D *)proj.At(i));
 	fit = ((TF1 *)fitArr.At(i));
 	fit->SetParameter(4, -0.015);
