@@ -17,7 +17,7 @@
 
 #define _NDF_MAX_ 1000
 
-void analysis_res_vs_eta_check_gaus()
+void analysis_res_dist()
 {
   // Load basic libraries;
   gROOT->Macro("$VMCWORKDIR/gconfig/rootlogon.C");  
@@ -98,13 +98,15 @@ void analysis_res_vs_eta_check_gaus()
   } 
 
   for (int i = 0; i < nbin; i++){
-	cout << count[i] << endl;
+	cout << i << " - " << count[i] << endl;
   }
-  TFile f("output/20_w_2gaus.root","new");
+  TFile f("output/5_w_2gaus.root","recreate");
   gStyle->SetOptStat(11);
   gStyle->SetOptFit(1);
-  gStyle->SetStatW(0.2);
-  gStyle->SetStatH(0.3);
+  gStyle->SetStatW(0.155);
+  gStyle->SetStatH(0.255);
+  //gStyle->SetTitleFontSize(.8);
+  //gStyle->SetLabelSize(.5, "XY");
   TCanvas *canv = new TCanvas("canv", "canv", 1600, 1200);
   canv->Divide(4,4);
   
@@ -114,8 +116,14 @@ void analysis_res_vs_eta_check_gaus()
 	fit = ((TF1 *)fitArr.At(i));
 	fit->SetParameter(4, -0.015);
 	fit->SetParameter(2, -0.015);
-	fit->SetParLimits(4, -0.02, 0.02);
-	fit->SetParLimits(2, -0.02, 0.02);
+	if (i == 17 || i == 32){
+		fit->SetParLimits(4, -0.05, 0.05);
+		fit->SetParLimits(2, -0.05, 0.05);
+	}
+	else{
+		fit->SetParLimits(4, -0.03, 0.03);
+		fit->SetParLimits(2, -0.03, 0.03);
+	}
  	dist->Fit(fit, "rll");
  	dist->GetXaxis()->SetTitle("dp/p");
   	dist->GetYaxis()->SetTitle("counts");
