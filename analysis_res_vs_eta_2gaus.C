@@ -93,8 +93,14 @@ void analysis_res_vs_eta_2gaus()
 		TF1 *f = new TF1(Form("fit%lu", i), "[0]/sqrt(2*TMath::Pi()*[2]^2)*exp(-0.5*((x-[1])/[2])**2) + [3]/sqrt(2*TMath::Pi()*[4]^2)*exp(-0.5*((x-[1])/[4])**2)", -0.03, 0.03);
 		f->SetParameter(4, -0.015);
 		f->SetParameter(2, -0.015);
-		f->SetParLimits(4, -0.02, 0.02);
-		f->SetParLimits(2, -0.02, 0.02);
+		if (i > 17 && i < 32){
+			f->SetParLimits(4, -0.03, 0.03);
+			f->SetParLimits(2, -0.03, 0.03);
+		}
+		else{
+			f->SetParLimits(4, -0.05, 0.05);
+			f->SetParLimits(2, -0.05, 0.05);
+		}
 		((TH1D *)proj.At(i))->Fit(f, "rll");
 		fit.Add(f);
 		//yerr_arr[i] =( (TF1 *)fit.At(i))->GetParError(2);
