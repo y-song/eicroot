@@ -63,8 +63,9 @@ void analysis_2D_norm()
   const int nhit_min = 3;
   const int nhit_max = 9;
   const int nhit_bin = nhit_max - nhit_min;
-  const double res_min = -0.3;
-  const double res_max = 0.3;
+  const double res_min = -0.03;
+  const double res_max = 0.03;
+  const int res_bin = (res_max - res_min) / 0.005;
   int nhit_arr[nhit_bin] = {0};
 
 #if 1
@@ -73,7 +74,8 @@ void analysis_2D_norm()
   TTreeFormula fHit("fHit", "FstMoCaPoint@.GetEntries()+BstMoCaPoint@.GetEntries()+VstMoCaPoint@.GetEntries()", cbmsim);
   TTreeFormula fx("fx", expression, cbmsim);
 
-  TH2* hist = new TH2D("hist", Form("%0.1f < eta < %0.1f", eta_min, eta_max), nhit_bin, nhit_min, nhit_max, 12, res_min, res_max);
+  TH2* hist = new TH2D("hist", Form("%0.1f < eta < %0.1f", eta_min, eta_max), nhit_bin, nhit_min, nhit_max, res_bin, res_min, res_max);
+  TH2* norm = new TH2D("norm", Form("%0.1f < eta < %0.1f", eta_min, eta_max), nhit_bin, nhit_min, nhit_max, res_bin, res_min, res_max);
   for (Long64_t j = 0; j < cbmsim->GetEntries(); j++) {
  	  cbmsim->GetEntry(j);
   	  const double eta_tru = fEtaTru.EvalInstance();
@@ -88,72 +90,12 @@ void analysis_2D_norm()
 	  nhit_arr[i] = hist->Integral(i+1, i+1);
   }
 
-  /*
- * int tot = 0; // tot < Entries that shows up in the histogram
   for (int i = 0; i < nhit_bin; i++){
-  	  cout << i << "-" << nhit_arr[i] << endl;
-  	  tot += nhit_arr[i];
+  	  for (int k = 0; k < res_bin; k++){
+		  double content = hist->GetBinContent(i+1, k+1) / nhit_arr[i];
+  	  	  norm->SetBinContent(i+1, k+1, content);
+  	  }
   }
-  
-  cout << "tot - " << tot << endl;
-
-  int tot1 = hist->Integral(1,1);
-  cout << "Integral1 - " << tot1 << endl;
-
-  int tot2 = hist->Integral(2,2);
-  cout << "Integral2 - " << tot2 << endl;
-
-  int tot3 = hist->Integral(3,3);
-  cout << "Integral3 - " << tot3 << endl;
-
-  int tot4 = hist->Integral(4,4);
-  cout << "Integral4 - " << tot4 << endl;
-
-  int tot5 = hist->Integral(5,5);
-  cout << "Integral5 - " << tot5 << endl;
-
-  int tot6 = hist->Integral(6,6);
-  cout << "Integral6 - " << tot6 << endl;
-
-  int tot = hist->Integral(1, 6);
-  cout << "Integral - " << tot << endl;
-
-  int test1 = hist->GetBin(3);
-  cout << "GetBin (3)- " << test1 << endl;
-
-  int test1 = hist->GetBin(4);
-  cout << "GetBin (4)- " << test1 << endl;
-
-  int test1 = hist->GetBin(4, -0.03);
-  cout << "GetBin (4, -0.03)- " << test1 << endl;
-
-  int test2 = hist->GetBin(0,0);
-  cout << "GetBin (0,0)- " << test2 << endl;
-
-  int test3 = hist->GetBinContent(3, 5);
-  cout << "GetBinContent (3, 5)- " << test3 << endl;
-
-  int test3 = hist->GetBinContent(4, 5);
-  cout << "GetBinContent (4, 5)- " << test3 << endl;
-
-  int test3 = hist->GetBinContent(5, 5);
-  cout << "GetBinContent (5, 5)- " << test3 << endl;
-
-  int test3 = hist->GetBinContent(6, 5);
-  cout << "GetBinContent (6, 5)- " << test3 << endl;
-
-  int test4 = hist->GetBinContent(0,0);
-  cout << "GetBinContent (0,0)" << test4 << endl;
-
-  int test4 = hist->GetBinContent(1,1);
-  cout << "GetBinContent (1,1)" << test4 << endl;
-
-  int test4 = hist->GetBinContent(2,2);
-  cout << "GetBinContent (2,2)" << test4 << endl;
-
-  int test4 = hist->GetBinContent(3,3);
-  cout << "GetBinContent (3,3)" << test4 << endl;
-*/
 
   TFile f("output/default.root","recreate");
 
@@ -161,9 +103,9 @@ void analysis_2D_norm()
   gStyle->SetStatW(0.155);
   gStyle->SetStatH(0.255);
   
-  hist->GetXaxis()->SetTitle("number of hits");
-  hist->GetYaxis()->SetTitle("dp/p");
-  hist->Draw("colz");
+  norm->GetXaxis()->SetTitle("number of hits");
+  norm->GetYaxis()->SetTitle("dp/p");
+  norm->Draw("colz");
 
 #endif
 }
