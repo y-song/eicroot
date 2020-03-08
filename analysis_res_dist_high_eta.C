@@ -70,16 +70,18 @@ void analysis_res_dist_high_eta()
  
 #if 1
   
-  TTreeFormula fEtaTru("fEtaTru","MCTrack.GetMomentum().Eta()", cbmsim);
+  TTreeFormula fEtaTru("fEtaTru", "MCTrack.GetMomentum().Eta()", cbmsim);
   TTreeFormula fx("fx", expression, cbmsim);
+  TTreeFormula fHit("fHit", "FstMoCaPoint@.GetEntries()+BstMoCaPoint@.GetEntries()+VstMoCaPoint@.GetEntries()", cbmsim);
+
   TObjArray proj;
   TObjArray fitArr;
   TH1D count_eta("count_eta", "", nbin, eta_min, eta_max);
   count_eta.Sumw2(); // If TH1::Sumw2() has been called before filling, the sum of squares is also stored.
   for (int i = 0; i < nbin; i++) {
-  	  proj.Add(new TH1D(Form("%0.1f_eta_%0.1f", eta_bin[i], eta_bin[i+1]),"", 50, -0.03, 0.03));
-  	  //fitArr.Add(new TF1(Form("fit%lu", i), "gaus(0)+gaus(3)", -0.03, 0.03));
- 	  fitArr.Add(new TF1(Form("fit%lu", i), "[0]/sqrt(2*TMath::Pi()*[2]^2)*exp(-0.5*((x-[1])/[2])**2) + [3]/sqrt(2*TMath::Pi()*[4]^2)*exp(-0.5*((x-[1])/[4])**2)", -0.03, 0.03));
+  	  proj.Add(new TH1D(Form("%0.1f_eta_%0.1f", eta_bin[i], eta_bin[i+1]),"", 50, -0.1, 0.1));
+  	  //fitArr.Add(new TF1(Form("fit%lu", i), "gaus(0)+gaus(3)", -0.1, 0.1));
+ 	  fitArr.Add(new TF1(Form("fit%lu", i), "[0]/sqrt(2*TMath::Pi()*[2]^2)*exp(-0.5*((x-[1])/[2])**2) + [3]/sqrt(2*TMath::Pi()*[4]^2)*exp(-0.5*((x-[1])/[4])**2)", -0.1, 0.1));
   }
   for (Long64_t j = 0; j < cbmsim->GetEntries(); j++) {
   //for (Long64_t j = 0; j < 20000; j++) {
@@ -100,7 +102,7 @@ void analysis_res_dist_high_eta()
   for (int i = 0; i < nbin; i++){
 	cout << i << " - " << count[i] << endl;
   }
-  TFile f("output/5_w_2gaus.root","recreate");
+  TFile f("output/default.root","recreate");
   gStyle->SetOptStat(11);
   gStyle->SetOptFit(1);
   gStyle->SetStatW(0.155);
@@ -116,8 +118,8 @@ void analysis_res_dist_high_eta()
 	fit = ((TF1 *)fitArr.At(i));
 	fit->SetParameter(4, -0.015);
 	fit->SetParameter(2, -0.015);
-	fit->SetParLimits(4, -0.05, 0.05);
-	fit->SetParLimits(2, -0.05, 0.05);
+	fit->SetParLimits(4, -0.1, 0.1);
+	fit->SetParLimits(2, -0.1, 0.1);
 	dist->Fit(fit, "rll");
  	dist->GetXaxis()->SetTitle("dp/p");
   	dist->GetYaxis()->SetTitle("counts");
