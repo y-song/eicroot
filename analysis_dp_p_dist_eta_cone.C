@@ -79,7 +79,7 @@ void analysis_dp_p_dist_eta_cone()
   TH1D count_nhit("count_nhit", "", nhit_bin, nhit_min, nhit_max);
   count_nhit.Sumw2(); // If TH1::Sumw2() has been called before filling, the sum of squares is also stored.
   for (int i = 0; i < nhit_bin; i++) {
-   	  if (i == 4 || i == 5 || i == 8) {
+   	  if (i == 4 || i == 8) {
 	  	proj.Add(new TH1D(Form("nhit=%d", i),"", res_bin_large, -0.05, 0.05));
   		fitArr.Add(new TF1(Form("fit%lu", i), "[0]/sqrt(2*TMath::Pi()*[2]^2)*exp(-0.5*((x-[1])/[2])**2) + [3]/sqrt(2*TMath::Pi()*[4]^2)*exp(-0.5*((x-[1])/[4])**2)", -0.05, 0.05));
 	  }
