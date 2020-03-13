@@ -63,7 +63,8 @@ void analysis_dp_p_dist_eta_cone()
   const int nhit_bin = nhit_max - nhit_min;
   const double res_min = -0.03;
   const double res_max = 0.03;
-  const int res_bin = (res_max - res_min) / 0.005;
+  const int res_bin = (res_max - res_min) / 0.001;
+  const int res_bin_large = (res_max - res_min) / 0.003;
   const double eta_min = 1.0;
   const double eta_max = 1.2;
 
@@ -78,8 +79,18 @@ void analysis_dp_p_dist_eta_cone()
   TH1D count_nhit("count_nhit", "", nhit_bin, nhit_min, nhit_max);
   count_nhit.Sumw2(); // If TH1::Sumw2() has been called before filling, the sum of squares is also stored.
   for (int i = 0; i < nhit_bin; i++) {
-  	  proj.Add(new TH1D(Form("nhit=%d", i),"", res_bin,res_min,res_max));
-	  fitArr.Add(new TF1(Form("fit%lu", i), "[0]/sqrt(2*TMath::Pi()*[2]^2)*exp(-0.5*((x-[1])/[2])**2) + [3]/sqrt(2*TMath::Pi()*[4]^2)*exp(-0.5*((x-[1])/[4])**2)", -0.03, 0.03));
+   	  if (i == 4 || i == 5 || i == 8) {
+	  	proj.Add(new TH1D(Form("nhit=%d", i),"", res_bin_large, -0.05, 0.05));
+  		fitArr.Add(new TF1(Form("fit%lu", i), "[0]/sqrt(2*TMath::Pi()*[2]^2)*exp(-0.5*((x-[1])/[2])**2) + [3]/sqrt(2*TMath::Pi()*[4]^2)*exp(-0.5*((x-[1])/[4])**2)", -0.05, 0.05));
+	  }
+  	  else if (i == 3) {
+	  	proj.Add(new TH1D(Form("nhit=%d", i),"", res_bin_large, -0.05, 0.05));
+	  	fitArr.Add(new TF1(Form("fit%lu", i), "[0]/sqrt(2*TMath::Pi()*[2]^2)*exp(-0.5*((x-[1])/[2])**2) + [3]/sqrt(2*TMath::Pi()*[4]^2)*exp(-0.5*((x-[1])/[4])**2)", -0.05, 0.05));
+	  }
+	  else {
+	  	proj.Add(new TH1D(Form("nhit=%d", i),"", res_bin, res_min, res_max));
+	  	fitArr.Add(new TF1(Form("fit%lu", i), "[0]/sqrt(2*TMath::Pi()*[2]^2)*exp(-0.5*((x-[1])/[2])**2) + [3]/sqrt(2*TMath::Pi()*[4]^2)*exp(-0.5*((x-[1])/[4])**2)", res_min, res_max));
+	  }
   }
  
   for (Long64_t j = 0; j < cbmsim->GetEntries(); j++) {
