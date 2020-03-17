@@ -73,7 +73,7 @@ void analysis_dp_p_dist_eta_cone()
   TTreeFormula fEtaTru("fEtaTru", "MCTrack.GetMomentum().Eta()", cbmsim);
   TTreeFormula fHit("fHit", "FstMoCaPoint@.GetEntries()+BstMoCaPoint@.GetEntries()+VstMoCaPoint@.GetEntries()", cbmsim);
   TTreeFormula fx("fx", expression, cbmsim);
-
+  
   TObjArray proj;
   TObjArray fitArr;
   TH1D count_nhit("count_nhit", "", nhit_bin, nhit_min, nhit_max);
@@ -98,10 +98,9 @@ void analysis_dp_p_dist_eta_cone()
   	  const double eta_tru = fEtaTru.EvalInstance();
 	  const double x = fx.EvalInstance();
 	  const int nhit = fHit.EvalInstance();
-	  if (eta_tru > eta_min && eta_tru < eta_max) {
-	  	((TH1D *)proj.At(nhit))->Fill(x);
-  	  }
-  } 
+	  const int rec = fRec.EvalInstance();
+          ((TH1D *)proj.At(nhit))->Fill(x);
+   } 
 
   TFile f("output/default.root","recreate");
   gStyle->SetOptStat(11);
