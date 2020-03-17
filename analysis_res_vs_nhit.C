@@ -67,6 +67,7 @@ void analysis_res_vs_nhit()
   
   TTreeFormula fx("fx", expression, cbmsim);
   TTreeFormula fHit("fHit", "FstMoCaPoint@.GetEntries()+BstMoCaPoint@.GetEntries()+VstMoCaPoint@.GetEntries()", cbmsim);
+  TTreeFormula fRec("fRec","PidChargedCand@.GetEntries()",cbmsim);
  
   TObjArray proj;
   TObjArray fitArr;
@@ -83,14 +84,35 @@ void analysis_res_vs_nhit()
 	  	proj.Add(new TH1D(Form("proj%lu", i), "", 50, -0.5, 0.5));
 		fitArr.Add(new TF1(Form("fit%lu", i), "[0]/sqrt(2*TMath::Pi()*[2]^2)*exp(-0.5*((x-[1])/[2])**2) + [3]/sqrt(2*TMath::Pi()*[4]^2)*exp(-0.5*((x-[1])/[4])**2)", -0.5, 0.5));
   	  }
-
   }
+
+  // Attempts on figuring out if x (the dp/p variable) is saved if the track is not reconstructed
+
+  const int entry = cbmsim->GetEntries();
+  cout << entry << endl;
+
+  double x_arr[100000] = {0};
+
   for (Long64_t j = 0; j < cbmsim->GetEntries(); j++) {
   	  cbmsim->GetEntry(j);
   	  const double nhit = fHit.EvalInstance();
 	  const double x = fx.EvalInstance();
-          ((TH1D *)proj.At(nhit))->Fill(x);
+          const int rec = fRec.EvalInstance();
+	  x_arr[j] = x;
+	  if (rec != 1) {
+	  	 cout << x << endl;
+	  }
+	  ((TH1D *)proj.At(nhit))->Fill(x);
   }
+
+  int count = 0;
+  for (Long64_t k = 0; k < cbmsim->GetEntries(); k++) {
+	  if (x_arr[k] != 0) {
+	  	count += 1;
+	  }
+  }
+
+  cout << count << endl;
  
   double y_arr[nhit_bin] = {0}; 
   double yerr_arr[nhit_bin] = {0};
