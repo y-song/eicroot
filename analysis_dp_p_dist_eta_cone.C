@@ -79,18 +79,18 @@ void analysis_dp_p_dist_eta_cone()
   TH1D count_nhit("count_nhit", "", nhit_bin, nhit_min, nhit_max);
   count_nhit.Sumw2(); // If TH1::Sumw2() has been called before filling, the sum of squares is also stored.
   for (int i = 0; i < nhit_bin; i++) {
-   	  if (i == 4 || i == 8) {
-	  	proj.Add(new TH1D(Form("nhit=%d", i),"", res_bin_large, -0.05, 0.05));
+	if (i == 4 || i == 5 || i == 7 || i == 8) {
+	  	proj.Add(new TH1D(Form("nhit=%d", i),"", 50, -0.05, 0.05));
   		fitArr.Add(new TF1(Form("fit%lu", i), "[0]/sqrt(2*TMath::Pi()*[2]^2)*exp(-0.5*((x-[1])/[2])**2) + [3]/sqrt(2*TMath::Pi()*[4]^2)*exp(-0.5*((x-[1])/[4])**2)", -0.05, 0.05));
-	  }
-  	  else if (i == 3) {
-	  	proj.Add(new TH1D(Form("nhit=%d", i),"", res_bin_large, -0.05, 0.05));
-	  	fitArr.Add(new TF1(Form("fit%lu", i), "[0]/sqrt(2*TMath::Pi()*[2]^2)*exp(-0.5*((x-[1])/[2])**2) + [3]/sqrt(2*TMath::Pi()*[4]^2)*exp(-0.5*((x-[1])/[4])**2)", -0.05, 0.05));
-	  }
-	  else {
-	  	proj.Add(new TH1D(Form("nhit=%d", i),"", res_bin, res_min, res_max));
-	  	fitArr.Add(new TF1(Form("fit%lu", i), "[0]/sqrt(2*TMath::Pi()*[2]^2)*exp(-0.5*((x-[1])/[2])**2) + [3]/sqrt(2*TMath::Pi()*[4]^2)*exp(-0.5*((x-[1])/[4])**2)", res_min, res_max));
-	  }
+	}
+	else if (i == 6) {
+	  	proj.Add(new TH1D(Form("nhit=%d", i),"", 50, -0.03, 0.03));
+  		fitArr.Add(new TF1(Form("fit%lu", i), "[0]/sqrt(2*TMath::Pi()*[2]^2)*exp(-0.5*((x-[1])/[2])**2) + [3]/sqrt(2*TMath::Pi()*[4]^2)*exp(-0.5*((x-[1])/[4])**2)", -0.03, 0.03));
+	}
+  	else {
+	  	proj.Add(new TH1D(Form("nhit=%d", i),"", 50, -0.5, 0.5));
+	  	fitArr.Add(new TF1(Form("fit%lu", i), "[0]/sqrt(2*TMath::Pi()*[2]^2)*exp(-0.5*((x-[1])/[2])**2) + [3]/sqrt(2*TMath::Pi()*[4]^2)*exp(-0.5*((x-[1])/[4])**2)", -0.5, 0.5));
+	}
   }
  
   for (Long64_t j = 0; j < cbmsim->GetEntries(); j++) {
@@ -117,8 +117,19 @@ void analysis_dp_p_dist_eta_cone()
 	fit = ((TF1 *)fitArr.At(i));
 	fit->SetParameter(4, -0.015);
 	fit->SetParameter(2, -0.015);
-	fit->SetParLimits(4, -0.03, 0.03);
-	fit->SetParLimits(2, -0.03, 0.03);
+        
+	if (i == 4 || i == 5 || i == 7 || i == 8){
+	        fit->SetParLimits(4, -0.05, 0.05);
+                fit->SetParLimits(2, -0.05, 0.05);
+        }
+        else if (i == 6){
+                fit->SetParLimits(4, -0.03, 0.03);
+                fit->SetParLimits(2, -0.03, 0.03);
+        }
+        else{
+                fit->SetParLimits(4, -0.5, 0.5);
+                fit->SetParLimits(2, -0.5, 0.5);
+        }
 
  	dist->Fit(fit, "rll");
  	dist->GetXaxis()->SetTitle("dp/p");
